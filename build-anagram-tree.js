@@ -3,11 +3,14 @@ var repl = require("repl");
 var _ = require("lodash");
 
 var dict = JSON.parse(fs.readFileSync("./dictionary.json"));
+var hist = JSON.parse(fs.readFileSync("./letter-histogram.json"));
+
+dict = dict.filter(function(word) { return word.length <= 15; });
 
 console.time("build anagram lookup");
 var lookup = {};
 dict.forEach(function(word) {
-	var normalized = _.sortBy(word).join("");
+	var normalized = _.sortBy(word, function(letter) { return -hist[letter]; }).join("");
 
 	lookup[normalized] = lookup[normalized] || [];
 	lookup[normalized].push(word);
