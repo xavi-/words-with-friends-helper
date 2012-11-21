@@ -14,6 +14,20 @@ dict.forEach(function(word) {
 });
 console.timeEnd("build anagram lookup");
 
+console.time("build anagram tree");
+var tree = {};
+_.each(lookup, function(words, letters) {
+	var node = tree;
+
+	_.each(letters, function(letter) {
+		node[letter] = node[letter] || {};
+		node = node[letter];
+	});
+
+	node._words = (node.words || []).concat(words);
+});
+console.timeEnd("build anagram tree");
+
 var r = repl.start({
 	prompt: "> ",
 	input: process.stdin,
@@ -23,3 +37,4 @@ var r = repl.start({
 });
 r.context.dict = dict;
 r.context.lookup = lookup;
+r.context.tree = tree;
