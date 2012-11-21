@@ -28,6 +28,8 @@ _.each(lookup, function(words, letters) {
 });
 console.timeEnd("build anagram tree");
 
+fs.writeFile("./anagram-tree.json", JSON.stringify(tree, null, "\t"));
+
 var r = repl.start({
 	prompt: "> ",
 	input: process.stdin,
