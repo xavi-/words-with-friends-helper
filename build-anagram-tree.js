@@ -30,6 +30,26 @@ console.timeEnd("build anagram tree");
 
 fs.writeFile("./anagram-tree.json", JSON.stringify(tree, null, "\t"));
 
+tree._depth = 0;
+var node, stack = [ tree ];
+var depths = {}, count = 0;
+while(node = stack.pop()) {
+	depths[node._depth] = (depths[node._depth] || 0) + 1;
+	count += 1;
+
+	Object.keys(node)
+		.filter(function(k) { return k.charAt(0) !== "_"; })
+		.forEach(function(key) {
+			node[key]._depth = node._depth + 1;
+			stack.push(node[key]);
+		})
+	;
+}
+
+console.log("depths:");
+console.dir(depths);
+console.log("total: " + count);
+
 var r = repl.start({
 	prompt: "> ",
 	input: process.stdin,
