@@ -57,25 +57,6 @@ console.log("depths:");
 console.dir(depths);
 console.log("total: " + count);
 
-console.time("build histo-tree");
-var alphabet = _.sortBy(Object.keys(hist), letterValue);
-var histoTree = {};
-_.each(dict, function(word) {
-	var wordHisto = _.countBy(word);
-
-	var node = histoTree;
-	_.each(alphabet, function(letter, idx) {
-		var count = wordHisto[letter] || 0;
-		node[count] = node[count] || (idx + 1 < alphabet.length ? {} : []);
-		node = node[count];
-	});
-
-	node.push(word);
-});
-console.timeEnd("build histo-tree");
-
-fs.writeFile("./anagram-histo-tree.json", JSON.stringify(histoTree, null, "\t"));
-
 function query(word) {
 	var normalized = _.sortBy(word, letterValue);
 	var words = [], node = tree;
