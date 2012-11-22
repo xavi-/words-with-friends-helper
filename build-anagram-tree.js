@@ -7,10 +7,12 @@ var hist = JSON.parse(fs.readFileSync("./letter-histogram.json"));
 
 dict = dict.filter(function(word) { return word.length <= 15; });
 
+function letterValue(letter) { return -hist[letter]; }
+
 console.time("build anagram lookup");
 var lookup = {};
 dict.forEach(function(word) {
-	var normalized = _.sortBy(word, function(letter) { return -hist[letter]; }).join("");
+	var normalized = _.sortBy(word, letterValue).join("");
 
 	lookup[normalized] = lookup[normalized] || [];
 	lookup[normalized].push(word);
@@ -55,6 +57,18 @@ console.log("depths:");
 console.dir(depths);
 console.log("total: " + count);
 
+function query(word) {
+	var normalized = _.sortBy(word, letterValue);
+	var words = [], node = tree;
+
+	_.each(normalized, function(letter) {
+		words = words.concat(node[letter]._words || []);
+		node = node[letter];
+	});
+
+	return words;
+}
+
 var r = repl.start({
 	prompt: "> ",
 	input: process.stdin,
@@ -65,3 +79,6 @@ var r = repl.start({
 r.context.dict = dict;
 r.context.lookup = lookup;
 r.context.tree = tree;
+r.context.query = query;
+r.context.letterValue = letterValue;
+r.context.lo = _;
