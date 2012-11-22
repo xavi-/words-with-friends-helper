@@ -33,6 +33,7 @@ console.timeEnd("build anagram tree");
 
 fs.writeFile("./anagram-tree.json", JSON.stringify(tree, null, "\t"));
 
+console.time("getting tree stats");
 tree._depth = 0;
 var node, stack = [ tree ];
 var depths = {}, count = 0;
@@ -48,6 +49,7 @@ while(node = stack.pop()) {
 		})
 	;
 }
+console.timeEnd("getting tree stats");
 
 console.log("depths:");
 console.dir(depths);
