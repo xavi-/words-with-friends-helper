@@ -5,6 +5,7 @@ const THRESHOLD = 218;
 const BOARD_OFFSET = { x: 1, y: 176 };
 const CELL_WIDTH = 51;
 const SCORE_RADIUS = 12;
+const BOARD_WIDTH = CELL_WIDTH * 15;
 
 function expandBoundingBox(box, point) {
 	if(point.x < box.topX) { box.topX = point.x; }
@@ -26,7 +27,7 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 	var ctx = canvas.getContext("2d");
 	ctx.drawImage(img, 0, 0, img.width / 2, img.height / 2);
 
-	var pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	var pixels = ctx.getImageData(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
 	var scoreBox = { topX: Infinity, topY: Infinity, bottomX: 0, bottomY: 0 };
 	for(var i = 0; i < pixels.data.length; i += 4) {
 		var red = pixels.data[i + 0], green = pixels.data[i + 1], blue = pixels.data[i + 2];
@@ -35,7 +36,7 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 			pixels.data[i + 1] = 0;
 			pixels.data[i + 2] = 0;
 
-			scoreBox = expandBoundingBox(scoreBox, { x: (i / 4) % canvas.width, y: (i / 4 / canvas.width) >> 0 });
+			scoreBox = expandBoundingBox(scoreBox, { x: (i / 4) % BOARD_WIDTH, y: (i / 4 / BOARD_WIDTH) >> 0 });
 		} else if(
 			red < 190 ||
 			green > red ||
@@ -51,14 +52,22 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 
 		pixels.data[i + 0] = pixels.data[i + 1] = pixels.data[i + 2] = (isOn ? 255 : 0);
 	}
-	ctx.putImageData(pixels, 0, 0);
+	scoreBox.topX += BOARD_OFFSET.x;
+	scoreBox.bottomX += BOARD_OFFSET.x;
+	scoreBox.topY += BOARD_OFFSET.y;
+	scoreBox.bottomY += BOARD_OFFSET.y;
+
+	ctx.putImageData(pixels, BOARD_OFFSET.x, BOARD_OFFSET.y);
 
 	ctx.fillStyle = "#000";
 	ctx.arc(scoreBox.topX + SCORE_RADIUS - 2, scoreBox.topY + SCORE_RADIUS - 2, SCORE_RADIUS, 0, Math.PI * 2);
 	ctx.fill();
 
+	ctx.strokeStyle = "#F00";
+	ctx.strokeRect(scoreBox.topX, scoreBox.topY, scoreBox.bottomX - scoreBox.topX, scoreBox.bottomY - scoreBox.topY);
+
 	ctx.strokeStyle = "#F0F";
-	ctx.strokeRect(BOARD_OFFSET.x, BOARD_OFFSET.y, 765, 765);
+	ctx.strokeRect(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
 
 	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
 		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
