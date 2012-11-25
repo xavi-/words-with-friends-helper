@@ -55,8 +55,8 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 			red < 190 ||
 			green > red ||
 			blue > red ||
-			(red / 2 > blue && red / 2 > green) ||
-			(red > 100 && red - blue  < 5 && blue - green < 5)
+			(red > blue + 10 && Math.abs(blue - green) < 20) || // Remove light red from double word label
+			(red > 100 && Math.abs(red - blue)  < 5 && Math.abs(blue - green) < 5) // Remove greys
 		) {
 			pixels.data[i + 0] = pixels.data[i + 1] = pixels.data[i + 2] = 255;
 		}
