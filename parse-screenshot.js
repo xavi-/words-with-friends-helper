@@ -17,6 +17,20 @@ function expandBoundingBox(box, point) {
 	return box;
 }
 
+function printSnip(snip) {
+	var out = [];
+	for(var r = 0, i = 0; r < 41; r++) {
+		var tmp = [];
+		for(var c = 0; c < 41; c++) {
+			tmp.push(snip[i++] ? "#" : " ");
+		}
+		out.push(tmp.join(""));
+	}
+
+	console.log(out.join("\n"));
+}
+
+
 fs.readFile("./test-images/test2.png", function(err, data) {
 	if(err) { throw err; }
 
@@ -69,14 +83,25 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 	ctx.strokeStyle = "#F0F";
 	ctx.strokeRect(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
 
+	var snips = [];
 	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
 		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
 			ctx.strokeStyle = "#F0F";
 			ctx.strokeRect(pixR + BOARD_OFFSET.x, pixC + BOARD_OFFSET.y, CELL_WIDTH, CELL_WIDTH);
 			ctx.strokeStyle = "#0F0";
 			ctx.strokeRect(pixR + BOARD_OFFSET.x + 5, pixC + BOARD_OFFSET.y + 5, 41, 41);
+
+			var snip = [];
+			var snipData = ctx.getImageData(pixR + BOARD_OFFSET.x + 5, pixC + BOARD_OFFSET.y + 5, 41, 41).data;
+
+			for(var d = 0; d < snipData.length; d += 4) {
+				snip.push(snipData[d] === 255);
+			}
+			snips.push(snip);
 		}
 	}
+
+	snips.forEach(printSnip);
 
 	canvas.toBuffer(function(err, buf) {
 		if(err) { throw err; }
