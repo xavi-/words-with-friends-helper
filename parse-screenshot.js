@@ -84,13 +84,8 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 	ctx.strokeRect(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
 
 	var snips = [];
-	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
-		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
-			ctx.strokeStyle = "#F0F";
-			ctx.strokeRect(pixR + BOARD_OFFSET.x, pixC + BOARD_OFFSET.y, CELL_WIDTH, CELL_WIDTH);
-			ctx.strokeStyle = "#0F0";
-			ctx.strokeRect(pixR + BOARD_OFFSET.x + 5, pixC + BOARD_OFFSET.y + 5, 41, 41);
-
+	for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
+		for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
 			var snip = [];
 			var snipData = ctx.getImageData(pixR + BOARD_OFFSET.x + 5, pixC + BOARD_OFFSET.y + 5, 41, 41).data;
 
@@ -98,6 +93,11 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 				snip.push(snipData[d] === 255);
 			}
 			snips.push(snip);
+
+			ctx.strokeStyle = "#F0F";
+			ctx.strokeRect(pixR + BOARD_OFFSET.x, pixC + BOARD_OFFSET.y, CELL_WIDTH, CELL_WIDTH);
+			ctx.strokeStyle = "#0F0";
+			ctx.strokeRect(pixR + BOARD_OFFSET.x + 5, pixC + BOARD_OFFSET.y + 5, 41, 41);
 		}
 	}
 
