@@ -30,7 +30,6 @@ function printSnip(snip) {
 	console.log(out.join("\n"));
 }
 
-
 fs.readFile("./test-images/test2.png", function(err, data) {
 	if(err) { throw err; }
 
