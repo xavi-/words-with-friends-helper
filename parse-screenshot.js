@@ -100,10 +100,10 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 	ctx.strokeRect(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
 
 	var snips = [];
-	for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
-		for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
+	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
+		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
 			var snip = [];
-			var snipData = ctx.getImageData(pixR + BOARD_OFFSET.x + 5, pixC + BOARD_OFFSET.y + 5, 41, 41).data;
+			var snipData = ctx.getImageData(pixC + BOARD_OFFSET.x + 5, pixR + BOARD_OFFSET.y + 5, 41, 41).data;
 
 			for(var d = 0; d < snipData.length; d += 4) {
 				snip.push(snipData[d] === 255);
