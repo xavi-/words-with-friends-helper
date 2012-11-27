@@ -28,6 +28,23 @@ function printSnip(snip) {
 	}
 
 	console.log(out.join("\n"));
+	return snip;
+}
+
+function blurSnip(snip) { // Gets rid of 1xN lines
+	for(var r = 0; r < 41; r++) {
+		for(var c = 0; c < 41; c++) {
+			var idx = r * 41 + c;
+			if(!snip[idx]) { continue; }
+
+			var idxRB = (r - 1) * 41 + c, idxRA = (r + 1) * 41 + c; // rows before and after
+			var idxCB = r * 41 + (c - 1), idxCA = r * 41 + (c + 1); // columns before and after
+
+			snip[idx] = (snip[idxRB] || snip[idxRA]) && (snip[idxCB] || snip[idxCA]);
+		}
+	}
+
+	return snip;
 }
 
 fs.readFile("./test-images/test2.png", function(err, data) {
