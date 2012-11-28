@@ -1,6 +1,8 @@
 var fs = require("fs");
 var Canvas = require("canvas");
 
+var helpers = require("./helpers");
+
 const THRESHOLD = 218;
 const BOARD_OFFSET = { x: 1, y: 176 };
 const CELL_WIDTH = 51;
@@ -15,20 +17,6 @@ function expandBoundingBox(box, point) {
 	if(point.y > box.bottomY) { box.bottomY = point.y; }
 
 	return box;
-}
-
-function printSnip(snip) {
-	var out = [];
-	for(var r = 0, i = 0; r < 41; r++) {
-		var tmp = [];
-		for(var c = 0; c < 41; c++) {
-			tmp.push(snip[i++] ? "#" : ".");
-		}
-		out.push(tmp.join(""));
-	}
-
-	console.log(out.join("\n"));
-	return snip;
 }
 
 function blurSnip(snip) { // Gets rid of 1xN lines
@@ -117,7 +105,7 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 		}
 	}
 
-	snips.forEach(printSnip);
+	snips.forEach(helpers.printSnip);
 
 	canvas.toBuffer(function(err, buf) {
 		if(err) { throw err; }
