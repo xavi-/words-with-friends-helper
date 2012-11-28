@@ -35,11 +35,9 @@ function blurSnip(snip) { // Gets rid of 1xN lines
 	return snip;
 }
 
-fs.readFile("./test-images/test2.png", function(err, data) {
-	if(err) { throw err; }
-
+function toSnip(imgBuf, callback) {
 	var img = new Canvas.Image();
-	img.src = data;
+	img.src = imgBuf;
 
 	var canvas = new Canvas(img.width / 2, img.height / 2);
 	var ctx = canvas.getContext("2d");
@@ -109,10 +107,9 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 		}
 	}
 
-	snips.forEach(helpers.printSnip);
+	if(callback) { canvas.toBuffer(callback); }
 
-	canvas.toBuffer(function(err, buf) {
-		if(err) { throw err; }
-		fs.writeFile("./result2.png", buf);
-	});
-});
+	return snips;
+}
+
+exports.toSnip = toSnip;
