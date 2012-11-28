@@ -97,7 +97,11 @@ fs.readFile("./test-images/test2.png", function(err, data) {
 				snip.push(snipData[d] === 255);
 			}
 			snips.push(snip);
+		}
+	}
 
+	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
+		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
 			ctx.strokeStyle = "#F0F";
 			ctx.strokeRect(pixR + BOARD_OFFSET.x, pixC + BOARD_OFFSET.y, CELL_WIDTH, CELL_WIDTH);
 			ctx.strokeStyle = "#0F0";
