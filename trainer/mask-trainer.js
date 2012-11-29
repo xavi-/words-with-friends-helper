@@ -16,7 +16,7 @@ function createTrainingData(callback) {
 		fs.readFile(path.resolve(__dirname, "./images/" + file), function(err, data) {
 			if(err) { throw err; }
 
-			var snips = parseSS.toSnip(data, function(err, buf) {
+			var snips = parseSS.toSnips(data, function(err, buf) {
 				if(err) { throw err; }
 				fs.writeFile(path.resolve(__dirname, "./images/output/" + file), buf);
 			});

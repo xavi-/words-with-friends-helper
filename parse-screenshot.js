@@ -34,7 +34,7 @@ function blurSnip(snip) { // Gets rid of 1xN lines
 	return snip;
 }
 
-function toSnip(imgBuf, callback) {
+function toSnips(imgBuf, callback) {
 	var img = new Canvas.Image();
 	img.src = imgBuf;
 
@@ -111,4 +111,4 @@ function toSnip(imgBuf, callback) {
 	return snips;
 }
 
-exports.toSnip = toSnip;
+exports.toSnips = toSnips;
