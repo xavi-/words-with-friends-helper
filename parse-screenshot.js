@@ -1,4 +1,5 @@
 var Canvas = require("canvas");
+var _ = require("lodash");
 
 var helpers = require("./helpers");
 
@@ -112,4 +113,33 @@ function toSnips(imgBuf, callback) {
 	return snips;
 }
 
+function toBoard(imgBuf) {
+	var snips = toSnips(imgBuf, function() { });
+	var masks = _.pairs(require("./masks.json")).map(function(pair) {
+		pair[1] = _.map(pair[1], function(p) { return p === "1"; });
+		return pair;
+	});
+
+	var board = _.range(15).map(function() { return []; });
+	snips.forEach(function(snip, idx) {
+		var row = (idx / 15) >> 0, col = (idx % 15);
+		var counts = _.countBy(snip);
+
+		if(counts["true"] > 1500) { return board[row][col] = " "; }
+
+		var pair = _.max(masks, function(pair) {
+			var mask = pair[1];
+
+			return _.countBy(blurSnip(
+				_.zip(snip, mask).map(function(p) { return (p[0] !== p[1]); })
+			))["false"];
+		});
+
+		board[row][col] = (pair[0] === "TW" ? " " : pair[0]);
+	});
+
+	return board;
+}
+
 exports.toSnips = toSnips;
+exports.toBoard = toBoard;
