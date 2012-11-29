@@ -78,12 +78,6 @@ function toSnips(imgBuf, callback) {
 	ctx.arc(scoreBox.topX + SCORE_RADIUS - 2, scoreBox.topY + SCORE_RADIUS - 2, SCORE_RADIUS, 0, Math.PI * 2);
 	ctx.fill();
 
-	ctx.strokeStyle = "#F00";
-	ctx.strokeRect(scoreBox.topX, scoreBox.topY, scoreBox.bottomX - scoreBox.topX, scoreBox.bottomY - scoreBox.topY);
-
-	ctx.strokeStyle = "#F0F";
-	ctx.strokeRect(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
-
 	var snips = [];
 	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
 		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
@@ -96,6 +90,13 @@ function toSnips(imgBuf, callback) {
 			snips.push(snip);
 		}
 	}
+	if(!callback) { return snips; }
+
+	ctx.strokeStyle = "#F00";
+	ctx.strokeRect(scoreBox.topX, scoreBox.topY, scoreBox.bottomX - scoreBox.topX, scoreBox.bottomY - scoreBox.topY);
+
+	ctx.strokeStyle = "#F0F";
+	ctx.strokeRect(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
 
 	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
 		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
@@ -106,7 +107,7 @@ function toSnips(imgBuf, callback) {
 		}
 	}
 
-	if(callback) { canvas.toBuffer(callback); }
+	canvas.toBuffer(callback);
 
 	return snips;
 }
