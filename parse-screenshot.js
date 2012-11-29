@@ -1,4 +1,3 @@
-var fs = require("fs");
 var Canvas = require("canvas");
 
 var helpers = require("./helpers");
