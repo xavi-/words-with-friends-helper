@@ -113,9 +113,10 @@ function toSnips(imgBuf, callback) {
 	return snips;
 }
 
+var maskData = require("./data/masks.json");
 function toBoard(imgBuf) {
 	var snips = toSnips(imgBuf, function() { });
-	var masks = _.pairs(require("./masks.json")).map(function(pair) {
+	var masks = _.pairs(maskData).map(function(pair) {
 		pair[1] = _.map(pair[1], function(p) { return p === "1"; });
 		return pair;
 	});

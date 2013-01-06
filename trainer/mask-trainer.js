@@ -75,7 +75,7 @@ function createConicalMasks(callback) {
 	}
 
 	fs.writeFile(
-		path.resolve(__dirname, "../masks.json"),
+		path.resolve(__dirname, "../data/masks.json"),
 		JSON.stringify(conical, null, "\t"),
 		callback || noop
 	);

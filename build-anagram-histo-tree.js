@@ -2,8 +2,8 @@ var fs = require("fs");
 var repl = require("repl");
 var _ = require("lodash");
 
-var dict = JSON.parse(fs.readFileSync("./dictionary.json"));
-var hist = JSON.parse(fs.readFileSync("./letter-histogram.json"));
+var dict = JSON.parse(fs.readFileSync("./data/dictionary.json"));
+var hist = JSON.parse(fs.readFileSync("./data/letter-histogram.json"));
 
 dict = dict.filter(function(word) { return word.length <= 15; });
 
@@ -26,7 +26,7 @@ _.each(dict, function(word) {
 });
 console.timeEnd("build histo-tree");
 
-fs.writeFile("./anagram-histo-tree.json", JSON.stringify(histoTree, null, "\t"));
+fs.writeFile("./data/anagram-histo-tree.json", JSON.stringify(histoTree, null, "\t"));
 
 var r = repl.start({
 	prompt: "> ",
