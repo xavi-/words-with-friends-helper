@@ -127,7 +127,7 @@ function filterByPattern(words, pattern) {
 }
 
 var filterByPlacement = (function() {
-	function filterHorizontalPlacement(board, words, placement) {
+	function filterHorizontalPlacement(board, placement) {
 		var intersects = [], row = placement.row, col = placement.col;
 
 		for(var i = 0; i < placement.pattern.length; i++) {
@@ -156,7 +156,7 @@ var filterByPlacement = (function() {
 		return intersects;
 	}
 
-	function filterVerticalPlacement(board, words, placement) {
+	function filterVerticalPlacement(board, placement) {
 		var intersects = [], row = placement.row, col = placement.col;
 
 		for(var i = 0; i < placement.pattern.length; i++) {
@@ -188,8 +188,8 @@ var filterByPlacement = (function() {
 	return function filterByPlacement(board, words, placement) {
 		var intersects = (
 			placement.isVertical ?
-				filterVerticalPlacement(board, words, placement) :
-				filterHorizontalPlacement(board, words, placement)
+				filterVerticalPlacement(board, placement) :
+				filterHorizontalPlacement(board, placement)
 		);
 
 		return words.filter(function(word) {
@@ -197,7 +197,7 @@ var filterByPlacement = (function() {
 				return !!dict[intersect.pattern.replace("_", word.charAt(intersect.pos))];
 			});
 		});
-	}
+	};
 })();
 
 var multiplierCodes = {
@@ -207,7 +207,7 @@ var multiplierCodes = {
 	"D": { word: 2, letter: 1 },
 	"t": { word: 1, letter: 3 },
 	"T": { word: 3, letter: 1 }
-}
+};
 var boardVals = JSON.parse(fs.readFileSync("./board.json"));
 var letterVals = JSON.parse(fs.readFileSync("./letter-values.json"));
 function scorePlacement(placement) {
