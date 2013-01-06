@@ -1,28 +1,5 @@
 var fs = require("fs");
 var _ = require("lodash");
-var parseSS = require("./parse-screenshot");
-
-var board = [
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'A', ' ', ' ', ' ', ' ', ' ', ' ', 'M' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'N', ' ', ' ', ' ', ' ', ' ', ' ', 'A' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'O', ' ', ' ', ' ', ' ', ' ', ' ', 'C' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'T', ' ', ' ', 'D', 'I', 'N', 'E', 'R' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'H', 'A', 'L', 'E', 'D', ' ', ' ', 'A' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'E', ' ', ' ', ' ', ' ', ' ', ' ', 'M' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'R', ' ', ' ', ' ', ' ', ' ', 'F', 'E' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'U', ' ' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'Z', 'A', 'N', 'Y' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
-	[ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ]
-];
-board = _.map(board, function(row) { return _.invoke(row, "toLowerCase"); });
-
-var letters = [ "E", "G", "G", "E", "E", "G", "S" ];
-letters = _.invoke(letters, "toLowerCase");
 
 var dict = {};
 _.each(JSON.parse(fs.readFileSync("./data/dictionary.json")), function(word) { dict[word] = true; });
@@ -264,7 +241,5 @@ function getMaxScoringPlacement(board, letters) {
 	return _.max(placements, function(p) { return _.max(p.scores); });
 }
 
-console.log("board:");
-console.dir(board);
-console.log("letters:", letters);
-console.log(getMaxScoringPlacement(board, letters));
+exports.getValidPlacements = getValidPlacements;
+exports.getMaxScoringPlacement = getMaxScoringPlacement;
