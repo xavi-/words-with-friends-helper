@@ -29,7 +29,7 @@ _.each(JSON.parse(fs.readFileSync("./dictionary.json")), function(word) { dict[w
 
 var hist = JSON.parse(fs.readFileSync("./letter-histogram.json"));
 var alphabet = _.sortBy(Object.keys(hist), function(letter) { return hist[letter]; });
-//var histoTree = JSON.parse(fs.readFileSync("./anagram-histo-tree.json"));
+var histoTree = JSON.parse(fs.readFileSync("./anagram-histo-tree.json"));
 
 function getAnagrams(letters) {
 	var branches = [ histoTree ];
@@ -50,12 +50,12 @@ function getAnagrams(letters) {
 
 var getPlacements = (function() {
 	function getVerticalPlacements(board, letters, r, c) {
-		if(r < 0 && board[r - 1][c] !== " ") { return []; }
+		if(r > 0 && board[r - 1][c] !== " ") { return []; }
 
-		var blanks = 0, placements = [], isConnected = false, word = [];
+		var blanks = 0, placements = [], isConnected = false, pattern = [];
 		for(var dr = 0; r + dr < board.length; dr++) {
-			if(board[r + dr][c] === " ") { blanks += 1; word.push("*"); }
-			else { isConnected = true; word.push(board[r + dr][c]); }
+			if(board[r + dr][c] === " ") { blanks += 1; pattern.push("?"); }
+			else { isConnected = true; pattern.push(board[r + dr][c]); }
 
 			isConnected = isConnected ||
 				(c > 0 && board[r + dr][c - 1] !== " ") ||
@@ -66,7 +66,7 @@ var getPlacements = (function() {
 			if(!isConnected) { continue; }
 			if(blanks <= 0) { continue; }
 			if(dr + r + 1 === board.length || board[r + dr + 1][c] === " ") {
-				placements.push({ r: r, c: c, word: _.clone(word), isVertical: true });
+				placements.push({ row: r, col: c, pattern: _.clone(pattern), isVertical: true });
 			}
 		}
 
@@ -74,12 +74,12 @@ var getPlacements = (function() {
 	}
 
 	function getHorizontalPlacements(board, letters, r, c) {
-		if(c < 0 && board[r][c - 1] !== " ") { return []; }
+		if(c > 0 && board[r][c - 1] !== " ") { return []; }
 
-		var blanks = 0, placements = [], isConnected = false, word = [];
+		var blanks = 0, placements = [], isConnected = false, pattern = [];
 		for(var dc = 0; c + dc < board[r].length; dc++) {
-			if(board[r][c + dc] === " ") { blanks += 1; word.push("*"); }
-			else { isConnected = true; word.push(board[r][c + dc]); }
+			if(board[r][c + dc] === " ") { blanks += 1; pattern.push("?"); }
+			else { isConnected = true; pattern.push(board[r][c + dc]); }
 
 			isConnected = isConnected ||
 				(r > 0 && board[r - 1][c + dc] !== " ") ||
@@ -90,7 +90,7 @@ var getPlacements = (function() {
 			if(!isConnected) { continue; }
 			if(blanks <= 0) { continue; }
 			if(dc + c + 1 === board[r].length || board[r][c + dc + 1] === " ") {
-				placements.push({ r: r, c: c, word: _.clone(word), isHorizontal: true });
+				placements.push({ row: r, col: c, pattern: _.clone(pattern), isHorizontal: true });
 			}
 		}
 
@@ -110,7 +110,105 @@ var getPlacements = (function() {
 	};
 })();
 
+function filterByPattern(words, pattern) {
+	return _.filter(words, function(word) {
+		if(pattern.length !== word.length) { return false; }
+
+		for(var i = 0; i < pattern.length; i++) {
+			if(pattern[i] === "?") { continue; }
+
+			if(pattern[i] === word[i]) { continue; }
+
+			return false;
+		}
+
+		return true;
+	});
+}
+
+var filterByPlacement = (function() {
+	function filterHorizontalPlacement(board, words, placement) {
+		var intersects = [], row = placement.row, col = placement.col;
+
+		for(var i = 0; i < placement.pattern.length; i++) {
+			if(board[row][col] !== " ") { continue; }
+
+			var intersect = [ "?" ], dr = 1, stop = false;
+			while(!stop) {
+				stop = true;
+
+				if(row - dr > 0 && board[row - dr][col] !== " ") {
+					intersect.unshift(board[row - dr][col]);
+					stop = false;
+				}
+				if(row + dr < board.length && board[row + dr][col] !== " ") {
+					intersect.push(board[row + dr][col]);
+					stop = false;
+				}
+
+				dr += 1;
+			}
+
+			if(intersect.length > 1) { intersects.push({ pos: i, pattern: intersect.join("") }); }
+			col += 1;
+		}
+
+		return intersects;
+	}
+
+	function filterVerticalPlacement(board, words, placement) {
+		var intersects = [], row = placement.row, col = placement.col;
+
+		for(var i = 0; i < placement.pattern.length; i++) {
+			if(board[row][col] !== " ") { continue; }
+
+			var intersect = [ "?" ], dc = 1, stop = false;
+			while(!stop) {
+				stop = true;
+
+				if(col - dc > 0 && board[row][col - dc] !== " ") {
+					intersect.unshift(board[row][col - dc]);
+					stop = false;
+				}
+				if(col + dc < board[row].length && board[row][col + dc] !== " ") {
+					intersect.push(board[row][col + dc]);
+					stop = false;
+				}
+
+				dc += 1;
+			}
+
+			if(intersect.length > 1) { intersects.push({ pos: i, pattern: intersect.join("") }); }
+			row += 1;
+		}
+
+		return intersects;
+	}
+
+	return function filterByPlacement(board, words, placement) {
+		var intersects = (
+			placement.isVertical ?
+				filterVerticalPlacement(board, words, placement) :
+				filterHorizontalPlacement(board, words, placement)
+		);
+
+		return words.filter(function(word) {
+			return _.all(intersects, function(intersect) {
+				return !!dict[intersect.pattern.replace("_", word.charAt(intersect.pos))];
+			});
+		});
+	}
+})();
+
 var placements = getPlacements(board, letters);
+_.each(placements, function(placement) {
+	var allLetters = placement.pattern.filter(function(l) { return l !== "?"; }).concat(letters);
+
+	placement.words = getAnagrams(allLetters);
+	placement.words = filterByPattern(placement.words, placement.pattern);
+	placement.words = filterByPlacement(board, placement.words, placement);
+});
+placements = placements.filter(function(p) { return p.words.length > 0; });
 
 console.log("board:");
 console.dir(board);
