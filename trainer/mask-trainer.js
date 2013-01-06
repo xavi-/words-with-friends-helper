@@ -85,3 +85,17 @@ function createConicalMasks(callback) {
 
 exports.createTrainingData = createTrainingData;
 exports.createConicalMasks = createConicalMasks;
+
+if (require.main == module) { // being ran as script
+	console.log("Generating masks...");
+	createTrainingData(function(err) {
+		if(err) { throw err; }
+
+		console.log("Generated training data...");
+		createConicalMasks(function(err) {
+			if(err) { throw err; }
+
+			console.log("Completed generating masks.");
+		});
+	});
+}
