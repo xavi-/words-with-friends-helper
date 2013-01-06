@@ -242,22 +242,29 @@ function scorePlacement(placement) {
 	return placement;
 }
 
-var placements = getPlacements(board, letters);
-_.each(placements, function(placement) {
-	var allLetters = placement.pattern.filter(function(l) { return l !== "?"; }).concat(letters);
+function getValidPlacements(board, letters) {
+	var placements = getPlacements(board, letters);
+	_.each(placements, function(placement) {
+		var allLetters = placement.pattern.filter(function(l) { return l !== "?"; }).concat(letters);
 
-	var words = getAnagrams(allLetters);
-	words = filterByPattern(words, placement.pattern);
-	words = filterByPlacement(board, words, placement);
+		var words = getAnagrams(allLetters);
+		words = filterByPattern(words, placement.pattern);
+		words = filterByPlacement(board, words, placement);
 
-	placement.words = words;
-});
-placements = placements.filter(function(p) { return p.words.length > 0; });
-placements = placements.map(scorePlacement);
+		placement.words = words;
+	});
+	placements = placements.filter(function(p) { return p.words.length > 0; });
+	placements = placements.map(scorePlacement);
 
-var maxPlacement = _.max(placements, function(p) { return _.max(p.scores); });
+	return placements;
+}
+
+function getMaxScoringPlacement(board, letters) {
+	var placements = getValidPlacements(board, letters);
+	return _.max(placements, function(p) { return _.max(p.scores); });
+}
 
 console.log("board:");
 console.dir(board);
 console.log("letters:", letters);
-console.log(maxPlacement);
+console.log(getMaxScoringPlacement(board, letters));
