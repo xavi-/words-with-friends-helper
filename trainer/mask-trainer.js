@@ -5,7 +5,7 @@ var _ = require("lodash");
 var parseSS = require("../parse-screenshot");
 
 const noop = function() {};
-const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZw"; // w (lowercase w) is TW (triple word)
+const ALPHABET = "abcdefghijklmnopqrstuvwxyzW"; // W (lowercase W) is TW (triple word)
 
 function createTrainingData(callback) {
 	var boards = require("./training-boards.json");
@@ -37,7 +37,7 @@ function createTrainingData(callback) {
 						throw "Invalid letter ('" + letter + "') found in '" + file + "'.";
 					}
 
-					if(letter === "w") { letter = "TW"; }
+					if(letter === "W") { letter = "TW"; }
 
 					training[letter] = training[letter] || [];
 					training[letter].push(info.snip.map(function(val) { return (val ? "1" : "0"); }).join(""));
