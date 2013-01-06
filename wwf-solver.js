@@ -200,18 +200,64 @@ var filterByPlacement = (function() {
 	}
 })();
 
+var multiplierCodes = {
+	".": { word: 1, letter: 1 },
+	"*": { word: 1, letter: 1 },
+	"d": { word: 1, letter: 2 },
+	"D": { word: 2, letter: 1 },
+	"t": { word: 1, letter: 3 },
+	"T": { word: 3, letter: 1 }
+}
+var boardVals = JSON.parse(fs.readFileSync("./board.json"));
+var letterVals = JSON.parse(fs.readFileSync("./letter-values.json"));
+function scorePlacement(placement) {
+	var scores = {}, multipliers = { word: 1 };
+
+	var row = placement.row, col = placement.col;
+	var dr = 0, dc = 1;
+	if(placement.isVertical) { dr = 1; dc = 0; }
+
+	for(var i = 0; i < placement.words[0].length; i++) {
+		var isBlank = (board[row][col] === " ");
+		var multiplier = (isBlank ? multiplierCodes[boardVals[row][col]] : { word: 1, letter: 1 });
+
+		multipliers.word *= multiplier.word;
+		multipliers[i] = multiplier.letter;
+
+		row += dr; col += dc;
+	}
+
+	_.each(placement.words, function(word) {
+		var total = 0;
+
+		_.each(word, function(letter, idx) {
+			total += letterVals[letter] * multipliers[idx];
+		});
+
+		scores[word] = total * multipliers.word;
+	});
+
+	placement.scores = scores;
+
+	return placement;
+}
+
 var placements = getPlacements(board, letters);
 _.each(placements, function(placement) {
 	var allLetters = placement.pattern.filter(function(l) { return l !== "?"; }).concat(letters);
 
-	placement.words = getAnagrams(allLetters);
-	placement.words = filterByPattern(placement.words, placement.pattern);
-	placement.words = filterByPlacement(board, placement.words, placement);
+	var words = getAnagrams(allLetters);
+	words = filterByPattern(words, placement.pattern);
+	words = filterByPlacement(board, words, placement);
+
+	placement.words = words;
 });
 placements = placements.filter(function(p) { return p.words.length > 0; });
+placements = placements.map(scorePlacement);
+
+var maxPlacement = _.max(placements, function(p) { return _.max(p.scores); });
 
 console.log("board:");
 console.dir(board);
-console.log("placements:");
-console.dir(placements);
-console.log(placements.length);
+console.log("letters:", letters);
+console.log(maxPlacement);
