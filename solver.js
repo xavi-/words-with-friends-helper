@@ -199,14 +199,14 @@ function scorePlacement(board, placement) {
 		});
 
 		_.each(placement.intersects, function(pattern, pos) {
-			pos = parseInt(pos, 10);
 			var row = placement.row, col = placement.col;
 			var multiplier = multiplierCodes[boardVals[row + dr * pos][col + dc * pos]];
+			var hole = pattern.indexOf("?");
 			var intersect = pattern.replace("?", word.charAt(pos));
 
 			var subTotal = 0;
 			_.each(intersect, function(letter, idx) {
-				subTotal += letterVals[letter] * (idx === pos ? multiplier.letter : 1);
+				subTotal += letterVals[letter] * (idx === hole ? multiplier.letter : 1);
 			});
 
 			total += subTotal * multiplier.word;
