@@ -102,75 +102,61 @@ function filterByPattern(words, pattern) {
 	});
 }
 
-var filterByPlacement = (function() {
-	function filterHorizontalPlacement(board, placement) {
+var filterByIntersects = (function() {
+	function findVerticalIntersects(board, placement) {
 		var intersects = [], row = placement.row, col = placement.col;
 
-		for(var i = 0; i < placement.pattern.length; i++) {
+		for(var i = 0; i < placement.pattern.length; i++, col++) {
 			if(board[row][col] !== " ") { continue; }
 
-			var intersect = [ "?" ], dr = 1, stop = false;
-			while(!stop) {
-				stop = true;
+			var dr, intersect = [ "?" ];
 
-				if(row - dr > 0 && board[row - dr][col] !== " ") {
-					intersect.unshift(board[row - dr][col]);
-					stop = false;
-				}
-				if(row + dr < board.length && board[row + dr][col] !== " ") {
-					intersect.push(board[row + dr][col]);
-					stop = false;
-				}
-
-				dr += 1;
+			for(dr = 1; row - dr > 0 && board[row - dr][col] !== " "; dr++) {
+				intersect.unshift(board[row - dr][col]);
+			}
+			for(dr = 1; row + dr < board.length && board[row + dr][col] !== " "; dr++) {
+				intersect.push(board[row + dr][col]);
 			}
 
 			if(intersect.length > 1) { intersects.push({ pos: i, pattern: intersect.join("") }); }
-			col += 1;
 		}
 
 		return intersects;
 	}
 
-	function filterVerticalPlacement(board, placement) {
+	function findHorizontalIntersects(board, placement) {
 		var intersects = [], row = placement.row, col = placement.col;
 
-		for(var i = 0; i < placement.pattern.length; i++) {
+		for(var i = 0; i < placement.pattern.length; i++, row++) {
 			if(board[row][col] !== " ") { continue; }
 
-			var intersect = [ "?" ], dc = 1, stop = false;
-			while(!stop) {
-				stop = true;
+			var dc, intersect = [ "?" ];
 
-				if(col - dc > 0 && board[row][col - dc] !== " ") {
-					intersect.unshift(board[row][col - dc]);
-					stop = false;
-				}
-				if(col + dc < board[row].length && board[row][col + dc] !== " ") {
-					intersect.push(board[row][col + dc]);
-					stop = false;
-				}
-
-				dc += 1;
+			for(dc = 1; col - dc > 0 && board[row][col - dc] !== " "; dc++) {
+				intersect.unshift(board[row][col - dc]);
+			}
+			for(dc = 1; col + dc < board[row].length && board[row][col + dc] !== " "; dc++) {
+				intersect.push(board[row][col + dc]);
 			}
 
 			if(intersect.length > 1) { intersects.push({ pos: i, pattern: intersect.join("") }); }
-			row += 1;
 		}
 
 		return intersects;
 	}
 
-	return function filterByPlacement(board, words, placement) {
+	return function filterByIntersects(board, words, placement) {
 		var intersects = (
 			placement.isVertical ?
-				filterVerticalPlacement(board, placement) :
-				filterHorizontalPlacement(board, placement)
+				findHorizontalIntersects(board, placement) :
+				findVerticalIntersects(board, placement)
 		);
+
+		placement.intersects = intersects;
 
 		return words.filter(function(word) {
 			return _.all(intersects, function(intersect) {
-				return !!dict[intersect.pattern.replace("_", word.charAt(intersect.pos))];
+				return !!dict[intersect.pattern.replace("?", word.charAt(intersect.pos))];
 			});
 		});
 	};
@@ -225,7 +211,7 @@ function getValidPlacements(board, letters) {
 
 		var words = getAnagrams(allLetters);
 		words = filterByPattern(words, placement.pattern);
-		words = filterByPlacement(board, words, placement);
+		words = filterByIntersects(board, words, placement);
 
 		placement.words = words;
 	});
