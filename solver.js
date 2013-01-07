@@ -1,12 +1,11 @@
-var fs = require("fs");
 var _ = require("lodash");
 
 var dict = {};
-_.each(JSON.parse(fs.readFileSync("./data/dictionary.json")), function(word) { dict[word] = true; });
+_.each(require("./data/dictionary.json"), function(word) { dict[word] = true; });
 
-var hist = JSON.parse(fs.readFileSync("./data/letter-histogram.json"));
+var hist = require("./data/letter-histogram.json");
 var alphabet = _.sortBy(Object.keys(hist), function(letter) { return hist[letter]; });
-var histoTree = JSON.parse(fs.readFileSync("./data/anagram-histo-tree.json"));
+var histoTree = require("./data/anagram-histo-tree.json");
 
 function getAnagrams(letters) {
 	var branches = [ histoTree ];
@@ -185,8 +184,8 @@ var multiplierCodes = {
 	"t": { word: 1, letter: 3 },
 	"T": { word: 3, letter: 1 }
 };
-var boardVals = JSON.parse(fs.readFileSync("./data/board.json"));
-var letterVals = JSON.parse(fs.readFileSync("./data/letter-values.json"));
+var boardVals = require("./data/board.json");
+var letterVals = require("./data/letter-values.json");
 function scorePlacement(board, placement) {
 	var scores = {}, multipliers = { word: 1 };
 
