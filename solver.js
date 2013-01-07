@@ -146,6 +146,8 @@ var filterByIntersects = (function() {
 	}
 
 	return function filterByIntersects(board, words, placement) {
+		if(words.length === 0) { return words; }
+
 		var intersects = (
 			placement.isVertical ?
 				findHorizontalIntersects(board, placement) :
