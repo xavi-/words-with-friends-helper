@@ -187,7 +187,7 @@ var multiplierCodes = {
 };
 var boardVals = JSON.parse(fs.readFileSync("./data/board.json"));
 var letterVals = JSON.parse(fs.readFileSync("./data/letter-values.json"));
-function scorePlacement(placement) {
+function scorePlacement(board, placement) {
 	var scores = {}, multipliers = { word: 1 };
 
 	var row = placement.row, col = placement.col;
@@ -231,7 +231,7 @@ function getValidPlacements(board, letters) {
 		placement.words = words;
 	});
 	placements = placements.filter(function(p) { return p.words.length > 0; });
-	placements = placements.map(scorePlacement);
+	placements = placements.map(function(p) { return scorePlacement(board, p); });
 
 	return placements;
 }
