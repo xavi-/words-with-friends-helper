@@ -198,6 +198,20 @@ function scorePlacement(board, placement) {
 			total += letterVals[letter] * multipliers[idx];
 		});
 
+		_.each(placement.intersects, function(pattern, pos) {
+			pos = parseInt(pos, 10);
+			var row = placement.row, col = placement.col;
+			var multiplier = multiplierCodes[boardVals[row + dr * pos][col + dc * pos]];
+			var intersect = pattern.replace("?", word.charAt(pos));
+
+			var subTotal = 0;
+			_.each(intersect, function(letter, idx) {
+				subTotal += letterVals[letter] * (idx === pos ? multiplier.letter : 1);
+			});
+
+			total += subTotal * multiplier.word;
+		});
+
 		scores[word] = total * multipliers.word;
 	});
 
