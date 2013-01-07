@@ -104,7 +104,7 @@ function filterByPattern(words, pattern) {
 
 var filterByIntersects = (function() {
 	function findVerticalIntersects(board, placement) {
-		var intersects = [], row = placement.row, col = placement.col;
+		var intersects = {}, row = placement.row, col = placement.col;
 
 		for(var i = 0; i < placement.pattern.length; i++, col++) {
 			if(board[row][col] !== " ") { continue; }
@@ -118,14 +118,14 @@ var filterByIntersects = (function() {
 				intersect.push(board[row + dr][col]);
 			}
 
-			if(intersect.length > 1) { intersects.push({ pos: i, pattern: intersect.join("") }); }
+			if(intersect.length > 1) { intersects[i] = intersect.join(""); }
 		}
 
 		return intersects;
 	}
 
 	function findHorizontalIntersects(board, placement) {
-		var intersects = [], row = placement.row, col = placement.col;
+		var intersects = {}, row = placement.row, col = placement.col;
 
 		for(var i = 0; i < placement.pattern.length; i++, row++) {
 			if(board[row][col] !== " ") { continue; }
@@ -139,7 +139,7 @@ var filterByIntersects = (function() {
 				intersect.push(board[row][col + dc]);
 			}
 
-			if(intersect.length > 1) { intersects.push({ pos: i, pattern: intersect.join("") }); }
+			if(intersect.length > 1) { intersects[i] = intersect.join(""); }
 		}
 
 		return intersects;
@@ -157,8 +157,8 @@ var filterByIntersects = (function() {
 		placement.intersects = intersects;
 
 		return words.filter(function(word) {
-			return _.all(intersects, function(intersect) {
-				return !!dict[intersect.pattern.replace("?", word.charAt(intersect.pos))];
+			return _.all(intersects, function(pattern, pos) {
+				return !!dict[pattern.replace("?", word.charAt(pos))];
 			});
 		});
 	};
