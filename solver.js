@@ -176,6 +176,7 @@ var boardVals = require("./data/board.json");
 var letterVals = require("./data/letter-values.json");
 function scorePlacement(board, placement) {
 	var scores = {}, multipliers = { word: 1 };
+	var bonus = (_.countBy(placement.pattern)["?"] >= 7 ? 35 : 0);
 
 	var row = placement.row, col = placement.col;
 	var dr = 0, dc = 1;
@@ -212,7 +213,7 @@ function scorePlacement(board, placement) {
 			total += subTotal * multiplier.word;
 		});
 
-		scores[word] = total * multipliers.word;
+		scores[word] = total * multipliers.word + bonus;
 	});
 
 	placement.scores = scores;
