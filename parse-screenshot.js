@@ -35,6 +35,43 @@ function blurSnip(snip) { // Gets rid of 1xN lines
 	return snip;
 }
 
+function findWordScoreBox(pixels) {
+	var scoreBox = { topX: Infinity, topY: Infinity, bottomX: 0, bottomY: 0 };
+
+	for(var i = 0; i < pixels.data.length; i += 4) {
+		var red = pixels.data[i + 0], green = pixels.data[i + 1], blue = pixels.data[i + 2];
+
+		if(red > 120 && green < 40 && blue < 30) { // Score indicator hue
+			scoreBox = expandBoundingBox(scoreBox, { x: (i / 4) % BOARD_WIDTH, y: (i / 4 / BOARD_WIDTH) >> 0 });
+		}
+	}
+
+	return scoreBox;
+}
+
+function decolor(pixels) {
+	for(var i = 0; i < pixels.data.length; i += 4) {
+		var red = pixels.data[i + 0], green = pixels.data[i + 1], blue = pixels.data[i + 2];
+
+		if(red > 120 && green < 40 && blue < 30) { // Get rid of score indicator
+			pixels.data[i + 0] = pixels.data[i + 1] = pixels.data[i + 2] = 0;
+		} else if(
+			red < 190 ||
+			green > red ||
+			blue > red ||
+			(red > blue + 10 && Math.abs(blue - green) < 20) || // Remove light red from double word label
+			(red > 100 && Math.abs(red - blue)  < 5 && Math.abs(blue - green) < 5) // Remove greys
+		) {
+			pixels.data[i + 0] = pixels.data[i + 1] = pixels.data[i + 2] = 255;
+		} else {
+			var isOn = THRESHOLD < (red * 0.3 + green * 0.59 + blue * 0.11);
+			pixels.data[i + 0] = pixels.data[i + 1] = pixels.data[i + 2] = (isOn ? 255 : 0);
+		}
+	}
+
+	return pixels;
+}
+
 function toSnips(imgBuf, callback) {
 	var img = new Canvas.Image();
 	img.src = imgBuf;
@@ -44,36 +81,15 @@ function toSnips(imgBuf, callback) {
 	ctx.drawImage(img, 0, 0, img.width / 2, img.height / 2);
 
 	var pixels = ctx.getImageData(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
-	var scoreBox = { topX: Infinity, topY: Infinity, bottomX: 0, bottomY: 0 };
-	for(var i = 0; i < pixels.data.length; i += 4) {
-		var red = pixels.data[i + 0], green = pixels.data[i + 1], blue = pixels.data[i + 2];
-		if(red > 120 && green < 40 && blue < 30) { // Get rid of score indicator
-			pixels.data[i + 0] = 0;
-			pixels.data[i + 1] = 0;
-			pixels.data[i + 2] = 0;
+	var scoreBox = findWordScoreBox(pixels);
+	var nocolor = decolor(pixels);
 
-			scoreBox = expandBoundingBox(scoreBox, { x: (i / 4) % BOARD_WIDTH, y: (i / 4 / BOARD_WIDTH) >> 0 });
-		} else if(
-			red < 190 ||
-			green > red ||
-			blue > red ||
-			(red > blue + 10 && Math.abs(blue - green) < 20) || // Remove light red from double word label
-			(red > 100 && Math.abs(red - blue)  < 5 && Math.abs(blue - green) < 5) // Remove greys
-		) {
-			pixels.data[i + 0] = pixels.data[i + 1] = pixels.data[i + 2] = 255;
-		}
-
-		red = pixels.data[i + 0]; green = pixels.data[i + 1]; blue = pixels.data[i + 2];
-		var isOn = THRESHOLD < (red * 0.3 + green * 0.59 + blue * 0.11);
-
-		pixels.data[i + 0] = pixels.data[i + 1] = pixels.data[i + 2] = (isOn ? 255 : 0);
-	}
 	scoreBox.topX += BOARD_OFFSET.x;
 	scoreBox.bottomX += BOARD_OFFSET.x;
 	scoreBox.topY += BOARD_OFFSET.y;
 	scoreBox.bottomY += BOARD_OFFSET.y;
 
-	ctx.putImageData(pixels, BOARD_OFFSET.x, BOARD_OFFSET.y);
+	ctx.putImageData(nocolor, BOARD_OFFSET.x, BOARD_OFFSET.y);
 
 	ctx.fillStyle = "#000";
 	ctx.arc(scoreBox.topX + SCORE_RADIUS - 2, scoreBox.topY + SCORE_RADIUS - 2, SCORE_RADIUS, 0, Math.PI * 2);
