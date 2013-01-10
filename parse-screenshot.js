@@ -4,10 +4,9 @@ var _ = require("lodash");
 var helpers = require("./helpers");
 
 const THRESHOLD = 218;
-const BOARD_OFFSET = { x: 1, y: 176 };
-const CELL_WIDTH = 51;
+const BOARD = { x: 1, y: 176, cell: 51, width: 51 * 15, height: 51 * 15 };
+const TILES = { x: 147, y: 951, cell: 65, padding: 3, width: (65 + 3) * 7 - 3, height: 65 };
 const SCORE_RADIUS = 12;
-const BOARD_WIDTH = CELL_WIDTH * 15;
 
 function expandBoundingBox(box, point) {
 	if(point.x < box.topX) { box.topX = point.x; }
@@ -42,7 +41,7 @@ function findWordScoreBox(pixels) {
 		var red = pixels.data[i + 0], green = pixels.data[i + 1], blue = pixels.data[i + 2];
 
 		if(red > 120 && green < 40 && blue < 30) { // Score indicator hue
-			scoreBox = expandBoundingBox(scoreBox, { x: (i / 4) % BOARD_WIDTH, y: (i / 4 / BOARD_WIDTH) >> 0 });
+			scoreBox = expandBoundingBox(scoreBox, { x: (i / 4) % BOARD.width, y: (i / 4 / BOARD.height) >> 0 });
 		}
 	}
 
@@ -72,6 +71,74 @@ function decolor(pixels) {
 	return pixels;
 }
 
+function dataToSnip(pixels) {
+	var data = pixels.data || pixels;
+	var snip = [];
+
+	for(var d = 0; d < data.length; d += 4) {
+		snip.push(data[d] === 255);
+	}
+
+	return snip;
+}
+
+function getBoardSnips(ctxScreen) {
+	var board = ctxScreen.getImageData(BOARD.x, BOARD.y, BOARD.width, BOARD.height);
+	var scoreBox = findWordScoreBox(board);
+	scoreBox.topX += BOARD.x;
+	scoreBox.bottomX += BOARD.x;
+	scoreBox.topY += BOARD.y;
+	scoreBox.bottomY += BOARD.y;
+
+	ctxScreen.putImageData(decolor(board), BOARD.x, BOARD.y);
+
+	ctxScreen.fillStyle = "#000";
+	ctxScreen.arc(scoreBox.topX + SCORE_RADIUS - 2, scoreBox.topY + SCORE_RADIUS - 2, SCORE_RADIUS, 0, Math.PI * 2);
+	ctxScreen.fill();
+
+	var snips = [];
+	for(var r = 0, pixR = 0; r < 15; r++, pixR += BOARD.cell) {
+		for(var c = 0, pixC = 0; c < 15; c++, pixC += BOARD.cell) {
+			var data = ctxScreen.getImageData(pixC + BOARD.x + 5, pixR + BOARD.y + 5, 41, 41);
+
+			snips.push(dataToSnip(data));
+		}
+	}
+
+	snips.scoreBox = scoreBox;
+	return snips;
+}
+
+function getTileSnips(ctxScreen, debug) {
+	var snips = [];
+
+	for(var i = 0; i < 7; i++) {
+		var tileData = ctxScreen.getImageData(
+			TILES.x + (TILES.cell + TILES.padding) * i,
+			TILES.y,
+			TILES.cell,
+			TILES.cell
+		);
+
+		var temp = new Canvas(TILES.cell, TILES.cell);
+		temp.getContext("2d").putImageData(tileData, 0, 0);
+
+		var smaller = new Canvas(BOARD.cell, BOARD.cell);
+		var ctx = smaller.getContext("2d");
+		ctx.drawImage(temp, 0, 0, BOARD.cell, BOARD.cell);
+
+		var data = decolor(ctx.getImageData(5, 6, 41, 41));
+		snips.push(dataToSnip(data));
+
+		if(debug) {
+			ctx.putImageData(data, 5, 5);
+			ctxScreen.drawImage(smaller, TILES.x + (TILES.cell + TILES.padding) * i, TILES.y, BOARD.cell, BOARD.cell);
+		}
+	}
+
+	return snips;
+}
+
 function toSnips(imgBuf, callback) {
 	var img = new Canvas.Image();
 	img.src = imgBuf;
@@ -80,47 +147,26 @@ function toSnips(imgBuf, callback) {
 	var ctx = canvas.getContext("2d");
 	ctx.drawImage(img, 0, 0, img.width / 2, img.height / 2);
 
-	var pixels = ctx.getImageData(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
-	var scoreBox = findWordScoreBox(pixels);
-	var nocolor = decolor(pixels);
+	var snips = {
+		board: getBoardSnips(ctx),
+		tiles: getTileSnips(ctx, !!callback)
+	};
 
-	scoreBox.topX += BOARD_OFFSET.x;
-	scoreBox.bottomX += BOARD_OFFSET.x;
-	scoreBox.topY += BOARD_OFFSET.y;
-	scoreBox.bottomY += BOARD_OFFSET.y;
-
-	ctx.putImageData(nocolor, BOARD_OFFSET.x, BOARD_OFFSET.y);
-
-	ctx.fillStyle = "#000";
-	ctx.arc(scoreBox.topX + SCORE_RADIUS - 2, scoreBox.topY + SCORE_RADIUS - 2, SCORE_RADIUS, 0, Math.PI * 2);
-	ctx.fill();
-
-	var snips = [];
-	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
-		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
-			var snip = [];
-			var snipData = ctx.getImageData(pixC + BOARD_OFFSET.x + 5, pixR + BOARD_OFFSET.y + 5, 41, 41).data;
-
-			for(var d = 0; d < snipData.length; d += 4) {
-				snip.push(snipData[d] === 255);
-			}
-			snips.push(snip);
-		}
-	}
 	if(!callback) { return snips; }
 
+	var scoreBox = snips.board.scoreBox;
 	ctx.strokeStyle = "#F00";
 	ctx.strokeRect(scoreBox.topX, scoreBox.topY, scoreBox.bottomX - scoreBox.topX, scoreBox.bottomY - scoreBox.topY);
 
 	ctx.strokeStyle = "#F0F";
-	ctx.strokeRect(BOARD_OFFSET.x, BOARD_OFFSET.y, BOARD_WIDTH, BOARD_WIDTH);
+	ctx.strokeRect(BOARD.x, BOARD.y, BOARD.width, BOARD.width);
 
-	for(var r = 0, pixR = 0; r < 15; r++, pixR += CELL_WIDTH) {
-		for(var c = 0, pixC = 0; c < 15; c++, pixC += CELL_WIDTH) {
+	for(var r = 0, pixR = 0; r < 15; r++, pixR += BOARD.cell) {
+		for(var c = 0, pixC = 0; c < 15; c++, pixC += BOARD.cell) {
 			ctx.strokeStyle = "#F0F";
-			ctx.strokeRect(pixR + BOARD_OFFSET.x, pixC + BOARD_OFFSET.y, CELL_WIDTH, CELL_WIDTH);
+			ctx.strokeRect(pixR + BOARD.x, pixC + BOARD.y, BOARD.cell, BOARD.cell);
 			ctx.strokeStyle = "#0F0";
-			ctx.strokeRect(pixR + BOARD_OFFSET.x + 5, pixC + BOARD_OFFSET.y + 5, 41, 41);
+			ctx.strokeRect(pixR + BOARD.x + 5, pixC + BOARD.y + 5, 41, 41);
 		}
 	}
 
@@ -130,33 +176,44 @@ function toSnips(imgBuf, callback) {
 }
 
 var maskData = require("./data/masks.json");
-function toBoard(imgBuf) {
-	var snips = toSnips(imgBuf, function() { });
-	var masks = _.pairs(maskData).map(function(pair) {
-		pair[1] = _.map(pair[1], function(p) { return p === "1"; });
-		return pair;
+var masks = _.pairs(maskData).map(function(pair) {
+	pair[1] = _.map(pair[1], function(p) { return p === "1"; });
+	return pair;
+});
+function snipToLetter(snip) {
+	var counts = _.countBy(snip);
+
+	if(counts["true"] > 1500) { return " "; }
+
+	var pair = _.max(masks, function(pair) {
+		var mask = pair[1];
+
+		return _.countBy(blurSnip(
+			_.zip(snip, mask).map(function(p) { return (p[0] !== p[1]); })
+		))["false"];
 	});
+
+	return (pair[0] === "TW" ? " " : pair[0]);
+}
+function parse(imgBuf, callback) {
+	var snips = toSnips(imgBuf, callback);
 
 	var board = _.range(15).map(function() { return []; });
-	snips.forEach(function(snip, idx) {
+	snips.board.forEach(function(snip, idx) {
 		var row = (idx / 15) >> 0, col = (idx % 15);
-		var counts = _.countBy(snip);
 
-		if(counts["true"] > 1500) { return board[row][col] = " "; }
-
-		var pair = _.max(masks, function(pair) {
-			var mask = pair[1];
-
-			return _.countBy(blurSnip(
-				_.zip(snip, mask).map(function(p) { return (p[0] !== p[1]); })
-			))["false"];
-		});
-
-		board[row][col] = (pair[0] === "TW" ? " " : pair[0]);
+		board[row][col] = snipToLetter(snip);
 	});
 
-	return board;
+	var tiles = [];
+	snips.tiles.forEach(function(snip) {
+		var letter = snipToLetter(snip);
+
+		if(letter !== " ") { tiles.push(letter); }
+	});
+
+	return { board: board, tiles: tiles };
 }
 
-exports.toSnips = toSnips;
-exports.toBoard = toBoard;
+module.exports = parse;
+module.exports.toSnips = toSnips;
