@@ -3,7 +3,6 @@ var http = require("http");
 var bee = require("beeline");
 var quip = require("quip");
 var formidable = require("formidable");
-var _ = require("lodash");
 
 var parseSS = require("../parse-screenshot");
 var solver = require("../solver");
@@ -24,14 +23,14 @@ var router = bee.route({
 
 				fs.readFile(files["board"].path, function(err, imgBuf) {
 					console.time("parse image");
-					var board = parseSS.toBoard(imgBuf);
-					console.dir(board);
+					var screen = parseSS.toBoard(imgBuf);
+					console.log("board:");
+					console.dir(screen.board);
+					console.log("letters:", screen.letters);
 					console.timeEnd("parse image");
 
 					console.time("find placement");
-					var letters = _.invoke(_.compact(fields.letters.split(/\s*,?\s*/)), "toLowerCase");
-					console.log("letters:", letters);
-					var placement = solver.getMaxScoringPlacement(board, letters);
+					var placement = solver.getMaxScoringPlacement(screen.board, screen.letters);
 					console.log("max placement:");
 					console.dir(placement);
 					console.timeEnd("find placement");
