@@ -1,11 +1,11 @@
-var fs = require("fs")
+var fs = require("fs");
 var http = require("http");
 var bee = require("beeline");
 var quip = require("quip");
 var formidable = require("formidable");
 var _ = require("lodash");
 
-var parseSS = require("../parse-screenshot")
+var parseSS = require("../parse-screenshot");
 var solver = require("../solver");
 
 var router = bee.route({
