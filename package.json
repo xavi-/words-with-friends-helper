@@ -1,0 +1,19 @@
+{
+	"name": "words-with-friends-helper",
+	"version": "0.0.1",
+	"description": "A project that takes a screen of a words with friends screen shot and returns the most optimal word placement.",
+	"dependencies": {
+		"beeline": "",
+		"canvas": "",
+		"formidable": "",
+		"lodash": "",
+		"quip": ""
+	},
+	"devDependencies": {},
+	"scripts": {},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/xavi-/words-with-friends-helper.git"
+	},
+	"author": "Xavi"
+}
