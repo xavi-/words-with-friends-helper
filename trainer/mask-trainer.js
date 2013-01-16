@@ -21,6 +21,7 @@ function createTrainingData(callback) {
 				fs.writeFile(path.resolve(__dirname, "./images/output/" + file), buf);
 			});
 			snips
+				.board
 				.map(function(snip, idx) {
 					var row = (idx / 15) >> 0, col = (idx % 15);
 

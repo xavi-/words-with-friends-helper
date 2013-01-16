@@ -23,14 +23,14 @@ var router = bee.route({
 
 				fs.readFile(files["board"].path, function(err, imgBuf) {
 					console.time("parse image");
-					var screen = parseSS.toBoard(imgBuf);
+					var screen = parseSS(imgBuf);
 					console.log("board:");
 					console.dir(screen.board);
-					console.log("letters:", screen.letters);
+					console.log("tiles:", screen.tiles);
 					console.timeEnd("parse image");
 
 					console.time("find placement");
-					var placement = solver.getMaxScoringPlacement(screen.board, screen.letters);
+					var placement = solver.getMaxScoringPlacement(screen.board, screen.tiles);
 					console.log("max placement:");
 					console.dir(placement);
 					console.timeEnd("find placement");
