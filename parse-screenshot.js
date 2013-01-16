@@ -4,7 +4,7 @@ var _ = require("lodash");
 var helpers = require("./helpers");
 
 const THRESHOLD = 218;
-const BOARD = { x: 1, y: 176, cell: 51, width: 51 * 15, height: 51 * 15 };
+const BOARD = { x: 1, y: 175, cell: 51, width: 51 * 15, height: 51 * 15 };
 const TILES = { x: 147, y: 951, cell: 65, padding: 3, width: (65 + 3) * 7 - 3, height: 65 };
 const SCORE_RADIUS = 12;
 
@@ -127,7 +127,7 @@ function getTileSnips(ctxScreen, debug) {
 		var ctx = smaller.getContext("2d");
 		ctx.drawImage(temp, 0, 0, BOARD.cell, BOARD.cell);
 
-		var data = decolor(ctx.getImageData(5, 6, 41, 41));
+		var data = decolor(ctx.getImageData(5, 5, 41, 41));
 		snips.push(dataToSnip(data));
 
 		if(debug) {
