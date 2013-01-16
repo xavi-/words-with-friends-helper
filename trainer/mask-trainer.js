@@ -86,7 +86,7 @@ function createConicalMasks(callback) {
 exports.createTrainingData = createTrainingData;
 exports.createConicalMasks = createConicalMasks;
 
-if (require.main == module) { // being ran as script
+if (require.main === module) { // being ran as script
 	console.log("Generating masks...");
 	createTrainingData(function(err) {
 		if(err) { throw err; }
