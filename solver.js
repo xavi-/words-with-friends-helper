@@ -208,6 +208,7 @@ function scorePlacement(board, placement) {
 		_.each(word, function(letter, idx) {
 			total += letterVals[letter] * multipliers[idx];
 		});
+		total *= multipliers.word;
 
 		_.each(placement.intersects, function(pattern, pos) {
 			var row = placement.row, col = placement.col;
@@ -223,7 +224,7 @@ function scorePlacement(board, placement) {
 			total += subTotal * multiplier.word;
 		});
 
-		scores[word] = total * multipliers.word + bonus;
+		scores[word] = total + bonus;
 	});
 
 	placement.scores = scores;
