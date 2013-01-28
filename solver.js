@@ -7,6 +7,8 @@ var hist = require("./data/letter-histogram.json");
 var alphabet = _.sortBy(Object.keys(hist), function(letter) { return hist[letter]; });
 var histoTree = require("./data/anagram-histo-tree.json");
 
+var emptyBoardPlacements = require("./data/empty-board-placements.json");
+
 function getAnagrams(letters) {
 	var branches = [ histoTree ];
 	var wordHist = _.countBy(letters);
@@ -22,6 +24,10 @@ function getAnagrams(letters) {
 	});
 
 	return branches;
+}
+
+function isBoardEmpty(board) {
+	return _.countBy(_.flatten(board))[" "] === 225;
 }
 
 var getPlacements = (function() {
@@ -74,6 +80,10 @@ var getPlacements = (function() {
 	}
 
 	return function getPlacements(board, letters) {
+		if(isBoardEmpty(board)) {
+			return _.clone(emptyBoardPlacements);
+		}
+
 		var placements = [];
 		for(var r = 0; r < board.length; r++) {
 			for(var c = 0; c < board[r].length; c++) {
