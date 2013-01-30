@@ -1,5 +1,6 @@
 var fs = require("fs");
 var http = require("http");
+var util = require("util");
 var bee = require("beeline");
 var quip = require("quip");
 var formidable = require("formidable");
@@ -35,7 +36,32 @@ var router = bee.route({
 					console.dir(placement);
 					console.timeEnd("find placement");
 
-					res.json(placement);
+
+					var dc = 1, dr = 0;
+					if(placement.isVertical) { dc = 0; dr = 1; }
+					for(var i = 0; i < placement.pattern.length; i++) {
+						if(placement.pattern[i] !== "?") { continue; }
+
+						screen.board[placement.row + dr * i][placement.col + dc * i] = "(#)";
+					}
+
+					var out = util.inspect(placement) + "\n\n";
+					for(var r = 0; r < screen.board.length; r++) {
+						out += "\n" + Array(screen.board[r].length + 1).join("+---") + "+\n";
+
+						for(var c = 0; c < screen.board[r].length; c++) {
+							var chr = screen.board[r][c];
+
+							if(chr.length <= 1) { chr = " " + chr.toUpperCase() + " "; }
+
+							out += "|" + chr;
+						}
+
+						out += "|"
+					}
+					out += "\n" + Array(screen.board[0].length + 1).join("+---") + "+\n";
+
+					res.text(out);
 				});
 			});
 		}
