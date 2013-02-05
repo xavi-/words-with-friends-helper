@@ -121,7 +121,7 @@ var filterByIntersects = (function() {
 
 			var dr, intersect = [ "?" ];
 
-			for(dr = 1; row - dr > 0 && board[row - dr][col] !== " "; dr++) {
+			for(dr = 1; row - dr >= 0 && board[row - dr][col] !== " "; dr++) {
 				intersect.unshift(board[row - dr][col]);
 			}
 			for(dr = 1; row + dr < board.length && board[row + dr][col] !== " "; dr++) {
@@ -142,7 +142,7 @@ var filterByIntersects = (function() {
 
 			var dc, intersect = [ "?" ];
 
-			for(dc = 1; col - dc > 0 && board[row][col - dc] !== " "; dc++) {
+			for(dc = 1; col - dc >= 0 && board[row][col - dc] !== " "; dc++) {
 				intersect.unshift(board[row][col - dc]);
 			}
 			for(dc = 1; col + dc < board[row].length && board[row][col + dc] !== " "; dc++) {
