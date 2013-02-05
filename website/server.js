@@ -45,21 +45,19 @@ var router = bee.route({
 						screen.board[placement.row + dr * i][placement.col + dc * i] = "(#)";
 					}
 
-					var out = util.inspect(placement) + "\n\n";
+					var out = util.inspect(placement) + "\n";
+					out += "tiles: " + util.inspect(screen.tiles) + "\n";
 					for(var r = 0; r < screen.board.length; r++) {
-						out += "\n" + Array(screen.board[r].length + 1).join("+---") + "+\n";
+						out += "\n---" + Array(screen.board[r].length).join("+---") + "\n";
 
 						for(var c = 0; c < screen.board[r].length; c++) {
 							var chr = screen.board[r][c];
 
 							if(chr.length <= 1) { chr = " " + chr.toUpperCase() + " "; }
 
-							out += "|" + chr;
+							out += (c > 0 ? "|" : "") + chr;
 						}
-
-						out += "|"
 					}
-					out += "\n" + Array(screen.board[0].length + 1).join("+---") + "+\n";
 
 					res.text(out);
 				});
