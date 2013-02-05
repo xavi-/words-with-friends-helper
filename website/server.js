@@ -45,8 +45,9 @@ var router = bee.route({
 						screen.board[placement.row + dr * i][placement.col + dc * i] = "(#)";
 					}
 
-					var out = util.inspect(placement) + "\n";
-					out += "tiles: " + util.inspect(screen.tiles) + "\n";
+					var out = "tiles: " + util.inspect(screen.tiles) + "\n\n";
+					out += "results:\n" + util.inspect(placement) + "\n\n";
+					out += "board:";
 					for(var r = 0; r < screen.board.length; r++) {
 						out += "\n---" + Array(screen.board[r].length).join("+---") + "\n";
 
