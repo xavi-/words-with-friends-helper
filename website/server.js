@@ -14,6 +14,7 @@ var router = bee.route({
 	],
 	"/ /index.html": bee.staticFile("./index.html", "text/html"),
 	"/upload-screenshot": {
+		"any": function(req, res) { res.redirect("/"); },
 		"POST": function(req, res) {
 			var form = formidable.IncomingForm();
 			form.parse(req, function(err, fields, files) {
