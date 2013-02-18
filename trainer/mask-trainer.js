@@ -8,11 +8,32 @@ var parseSS = require("../parse-screenshot");
 const noop = function() {};
 const ALPHABET = "abcdefghijklmnopqrstuvwxyzW"; // W (lowercase W) is TW (triple word)
 
+function addTrainingData(training, snip, letter) {
+	var counts = _.countBy(snip);
+	if(counts["true"] > 1500) { // Cell is all white (i.e. empty)
+		if(letter !== ".") { return "Empty cell should be '" + letter + "'"; }
+		return "";
+	}
+
+	if(ALPHABET.indexOf(letter) < 0) {
+		return "Invalid letter ('" + letter + "') found in '" + file + "'.";
+	}
+
+	if(letter === "W") { letter = "TW"; }
+
+	training[letter] = training[letter] || [];
+	training[letter].push(snip.map(function(val) { return (val ? "1" : "0"); }).join(""));
+
+	return "";
+}
+
 function createTrainingData(callback) {
-	var boards = require("./training-boards.json");
+	var screens = require("./training-screens.json");
 
 	var pending = {}, training = {};
-	_(boards).each(function(board, file) {
+	_(screens).each(function(screen, file) {
+		var board = screen.board, tiles = screen.tiles;
+
 		pending[file] = true;
 		fs.readFile(path.resolve(__dirname, "./images/" + file), function(err, data) {
 			if(err) { throw err; }
@@ -21,34 +42,31 @@ function createTrainingData(callback) {
 				if(err) { throw err; }
 				fs.writeFile(path.resolve(__dirname, "./images/output/" + file), buf);
 			});
-			snips
-				.board
+			snips.board
 				.forEach(function(snip, idx) {
 					var row = (idx / 15) >> 0, col = (idx % 15);
-					var letter = board[row][col];
+					var err = addTrainingData(training, snip, board[row][col]);
 
-					var counts = _.countBy(snip);
-					if(counts["true"] > 1500) { // Cell is all white (i.e. empty)
-						if(letter !== ".") {
-							console.dir(board);
-							helpers.printSnip(snip);
-							console.log("Error in '" + file + "' at row: " + row + "; col: " + col);
-							throw "Empty cell should be '" + letter + "'";
-						}
-						return;
+					if(err) {
+						console.dir(board);
+						helpers.printSnip(snip);
+						console.log("Error in '" + file + "' at row: " + row + "; col: " + col);
+						throw err;
 					}
-
-					if(ALPHABET.indexOf(letter) < 0) {
-						throw "Invalid letter ('" + letter + "') found in '" + file + "'.";
-					}
-
-					if(letter === "W") { letter = "TW"; }
-
-					training[letter] = training[letter] || [];
-					training[letter].push(snip.map(function(val) { return (val ? "1" : "0"); }).join(""));
 				})
 			;
+			snips.tiles
+				.forEach(function(snip, idx) {
+					var err = addTrainingData(training, snip, tiles[idx]);
 
+					if(err) {
+						console.dir(tiles);
+						helpers.printSnip(snip);
+						console.log("Error in '" + file + "' at idx: " + idx);
+						throw err;
+					}
+				})
+			;
 			pending[file] = false;
 
 			if(!_.countBy(pending)["true"]) {
