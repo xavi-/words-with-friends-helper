@@ -24,20 +24,16 @@ function createTrainingData(callback) {
 			});
 			snips
 				.board
-				.map(function(snip, idx) {
+				.forEach(function(snip, idx) {
 					var row = (idx / 15) >> 0, col = (idx % 15);
+					var letter = board[row][col];
 
-					return { row: row, col: col, snip: snip };
-				})
-				.forEach(function(info) {
-					var letter = board[info.row][info.col];
-
-					var counts = _.countBy(info.snip);
+					var counts = _.countBy(snip);
 					if(counts["true"] > 1500) { // Cell is all white (i.e. empty)
 						if(letter !== ".") {
 							console.dir(board);
-							helpers.printSnip(info.snip);
-							console.log("Error in '" + file + "' at row: " + info.row + "; col: " + info.col);
+							helpers.printSnip(snip);
+							console.log("Error in '" + file + "' at row: " + row + "; col: " + col);
 							throw "Empty cell should be '" + letter + "'";
 						}
 						return;
@@ -50,7 +46,7 @@ function createTrainingData(callback) {
 					if(letter === "W") { letter = "TW"; }
 
 					training[letter] = training[letter] || [];
-					training[letter].push(info.snip.map(function(val) { return (val ? "1" : "0"); }).join(""));
+					training[letter].push(snip.map(function(val) { return (val ? "1" : "0"); }).join(""));
 				})
 			;
 
