@@ -3,7 +3,6 @@ var path = require("path");
 var _ = require("lodash");
 
 var helpers = require("../helpers");
-
 var parseSS = require("../parse-screenshot");
 
 const noop = function() {};
