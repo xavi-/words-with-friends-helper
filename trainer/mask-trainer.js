@@ -2,6 +2,8 @@ var fs = require("fs");
 var path = require("path");
 var _ = require("lodash");
 
+var helpers = require("../helpers");
+
 var parseSS = require("../parse-screenshot");
 
 const noop = function() {};
@@ -27,13 +29,20 @@ function createTrainingData(callback) {
 
 					return { row: row, col: col, snip: snip };
 				})
-				.filter(function(info) {
-					var counts = _.countBy(info.snip);
-
-					return (counts["true"] <= 1500);
-				})
 				.forEach(function(info) {
 					var letter = board[info.row][info.col];
+
+					var counts = _.countBy(info.snip);
+					if(counts["true"] > 1500) { // Cell is all white (i.e. empty)
+						if(letter !== ".") {
+							console.dir(board);
+							helpers.printSnip(info.snip);
+							console.log("Error in '" + file + "' at row: " + info.row + "; col: " + info.col);
+							throw "Empty cell should be '" + letter + "'";
+						}
+						return;
+					}
+
 					if(ALPHABET.indexOf(letter) < 0) {
 						throw "Invalid letter ('" + letter + "') found in '" + file + "'.";
 					}
