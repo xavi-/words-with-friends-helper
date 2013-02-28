@@ -40,7 +40,7 @@ var router = bee.route({
 
 					var dc = 1, dr = 0;
 					if(placement.isVertical) { dc = 0; dr = 1; }
-					for(var i = 0; i < placement.pattern.length; i++) {
+					for(var i = 0; placement.pattern && i < placement.pattern.length; i++) {
 						if(placement.pattern[i] !== "?") { continue; }
 
 						screen.board[placement.row + dr * i][placement.col + dc * i] = "(#)";
