@@ -1,0 +1,102 @@
+{
+	"test1.jpg": {
+		"board": [
+			"           e   ",
+			"       v cod   ",
+			"       i   i k ",
+			"       b   tone",
+			"     s eh  i e ",
+			"  hail  a  o l ",
+			"     e  g  n l ",
+			"   a e grams   ",
+			"   z t  o      ",
+			" moody  d      ",
+			"   t   ne      ",
+			"   evade       ",
+			"       x       ",
+			"     trugs     ",
+			"   awa s       "
+		],
+		"tiles": [ "r", "i", "o", "q", "j", "e", "f" ]
+	},
+	"test2.jpg": {
+		"board": [
+			"               ",
+			"               ",
+			"               ",
+			"               ",
+			"               ",
+			"        aw     ",
+			"        bi     ",
+			"       baguet  ",
+			"       us      ",
+			"       i       ",
+			"       l       ",
+			"       t       ",
+			"               ",
+			"               ",
+			"               "
+		],
+		"tiles": [ "i", "y", "e", "w", "i", "e", "m" ]
+	},
+	"test3.jpg": {
+		"board": [
+			"           ka  ",
+			"           on  ",
+			"          fid  ",
+			"          l s h",
+			" q   xu joe   o",
+			" u  dittoed  am",
+			"cilia     g  no",
+			"at  data hights",
+			"g    now  e  l ",
+			"es  za    r vee",
+			" if al h e   r ",
+			"obey clips vast",
+			" be  i deperm  ",
+			"     t   y our ",
+			"  unrent   w   "
+		],
+		"tiles": []
+	},
+	"test4.jpg": {
+		"board": [
+			"    tad        ",
+			" retore        ",
+			"  lip  garb    ",
+			"   g c r  ovate",
+			"   h oka       ",
+			"   toxines     ",
+			"      nu t     ",
+			"   bloom awl   ",
+			"  heir   die   ",
+			" fend c  inn   ",
+			"  hes h zags   ",
+			"da   jives     ",
+			"em ryot p      ",
+			"a quey         ",
+			"flints         "
+		],
+		"tiles": [ "a", "i", "t", "e", "u" ]
+	},
+	"test5.jpg": {
+		"board": [
+			"               ",
+			"               ",
+			"               ",
+			"               ",
+			"        jo     ",
+			"    dittoed    ",
+			"cilia          ",
+			"a   data       ",
+			"g    n         ",
+			"es   a         ",
+			" i   l         ",
+			"obey clip      ",
+			" b   i         ",
+			"     t         ",
+			"  unrent       "
+		],
+		"tiles": [ "i", "g", "p", "o", "r", "y", "k" ]
+	}
+}
