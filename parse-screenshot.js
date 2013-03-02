@@ -53,7 +53,7 @@ function decolor(pixels) {
 		var red = pixels.data[i + 0], green = pixels.data[i + 1], blue = pixels.data[i + 2];
 
 		if(
-			red < 190 ||
+			red < 170 ||
 			green > red ||
 			blue > red ||
 			(red > blue + 10 && Math.abs(blue - green) < 20) || // Remove light red from double word label
