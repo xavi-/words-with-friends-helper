@@ -8,7 +8,7 @@ var parseSS = require("../parse-screenshot");
 const noop = function() {};
 const ALPHABET = "abcdefghijklmnopqrstuvwxyzW"; // W (lowercase W) is TW (triple word)
 
-function addTrainingData(training, snip, letter) {
+function addTrainingData(training, file, snip, letter) {
 	var counts = _.countBy(snip);
 	if(counts["true"] > 1500) { // Cell is all white (i.e. empty)
 		if(letter !== ".") { return "Empty cell should be '" + letter + "'"; }
@@ -45,7 +45,7 @@ function createTrainingData(callback) {
 			snips.board
 				.forEach(function(snip, idx) {
 					var row = (idx / 15) >> 0, col = (idx % 15);
-					var err = addTrainingData(training, snip, board[row][col]);
+					var err = addTrainingData(training, file, snip, board[row][col]);
 
 					if(err) {
 						console.dir(board);
@@ -57,7 +57,7 @@ function createTrainingData(callback) {
 			;
 			snips.tiles
 				.forEach(function(snip, idx) {
-					var err = addTrainingData(training, snip, tiles[idx]);
+					var err = addTrainingData(training, file, snip, tiles[idx]);
 
 					if(err) {
 						console.dir(tiles);
