@@ -35,7 +35,7 @@ _.each(lookup, function(words, letters) {
 console.timeEnd("build anagram tree");
 
 fs.writeFile(
-	path.resolve(__dirname, "./data/anagram-tree.json"),
+	path.resolve(__dirname, "./data/generated/anagram-tree.json"),
 	JSON.stringify(tree, null, "\t")
 );
 

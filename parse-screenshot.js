@@ -173,12 +173,18 @@ function toSnips(imgBuf, callback) {
 	return snips;
 }
 
-var maskData = require("./data/masks.json");
-var masks = _.pairs(maskData).map(function(pair) {
-	pair[1] = _.map(pair[1], function(p) { return p === "1"; });
-	return pair;
-});
-function snipToLetter(snip) {
+function getMasks() {
+	if(getMasks.masks) { return getMasks.masks; }
+
+	var maskData = require("./data/generated/masks.json");
+	getMasks.masks = _.pairs(maskData).map(function(pair) {
+		pair[1] = _.map(pair[1], function(p) { return p === "1"; });
+		return pair;
+	});
+
+	return getMasks.masks;
+}
+function snipToLetter(snip, masks) {
 	var counts = _.countBy(snip);
 
 	if(counts["true"] > 1500) { return " "; }
@@ -194,18 +200,19 @@ function snipToLetter(snip) {
 	return (pair[0] === "TW" ? " " : pair[0]);
 }
 function parse(imgBuf, callback) {
+	var masks = getMasks();
 	var snips = toSnips(imgBuf, callback);
 
 	var board = _.range(15).map(function() { return []; });
 	snips.board.forEach(function(snip, idx) {
 		var row = (idx / 15) >> 0, col = (idx % 15);
 
-		board[row][col] = snipToLetter(snip);
+		board[row][col] = snipToLetter(snip, masks);
 	});
 
 	var tiles = [];
 	snips.tiles.forEach(function(snip) {
-		var letter = snipToLetter(snip);
+		var letter = snipToLetter(snip, masks);
 
 		if(letter !== " ") { tiles.push(letter); }
 	});

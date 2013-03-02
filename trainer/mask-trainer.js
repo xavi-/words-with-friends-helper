@@ -70,18 +70,19 @@ function createTrainingData(callback) {
 			pending[file] = false;
 
 			if(!_.countBy(pending)["true"]) {
-				fs.writeFile(
-					path.resolve(__dirname, "./masks-training-data.json"),
-					JSON.stringify(training, null, "\t"),
-					callback || noop
-				);
+				(callback || noop)(null, training);
 			}
 		});
 	});
 }
 
-function createConicalMasks(callback) {
-	var training = require("./masks-training-data.json");
+function createConicalMasks(training, callback) {
+	if(typeof training === "function") {
+		return createTrainingData(function(err, training) {
+			createConicalMasks(training, callback);
+		});
+	}
+
 	var conical = {};
 	for(var letter in training) {
 		var data = training[letter];
@@ -98,7 +99,7 @@ function createConicalMasks(callback) {
 	}
 
 	fs.writeFile(
-		path.resolve(__dirname, "../data/masks.json"),
+		path.resolve(__dirname, "../data/generated/masks.json"),
 		JSON.stringify(conical, null, "\t"),
 		callback || noop
 	);
@@ -111,11 +112,11 @@ exports.createConicalMasks = createConicalMasks;
 
 if (require.main === module) { // being ran as script
 	console.log("Generating masks...");
-	createTrainingData(function(err) {
+	createTrainingData(function(err, training) {
 		if(err) { throw err; }
 
 		console.log("Generated training data...");
-		createConicalMasks(function(err) {
+		createConicalMasks(training, function(err) {
 			if(err) { throw err; }
 
 			console.log("Completed generating masks.");

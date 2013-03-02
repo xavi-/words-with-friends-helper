@@ -28,7 +28,7 @@ _.each(dict, function(word) {
 console.timeEnd("build histo-tree");
 
 fs.writeFile(
-	path.resolve(__dirname, "./data/anagram-histo-tree.json"),
+	path.resolve(__dirname, "./data/generated/anagram-histo-tree.json"),
 	JSON.stringify(histoTree, null, "\t")
 );
 

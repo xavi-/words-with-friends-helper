@@ -5,7 +5,7 @@ _.each(require("./data/dictionary.json"), function(word) { dict[word] = true; })
 
 var hist = require("./data/letter-histogram.json");
 var alphabet = _.sortBy(Object.keys(hist), function(letter) { return hist[letter]; });
-var histoTree = require("./data/anagram-histo-tree.json");
+var histoTree = require("./data/generated/anagram-histo-tree.json");
 
 var emptyBoardPlacements = require("./data/empty-board-placements.json");
 
