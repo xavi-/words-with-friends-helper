@@ -52,9 +52,7 @@ function decolor(pixels) {
 	for(var i = 0; i < pixels.data.length; i += 4) {
 		var red = pixels.data[i + 0], green = pixels.data[i + 1], blue = pixels.data[i + 2];
 
-		if(red > 120 && green < 40 && blue < 30) { // Get rid of score indicator
-			pixels.data[i + 0] = pixels.data[i + 1] = pixels.data[i + 2] = 0;
-		} else if(
+		if(
 			red < 190 ||
 			green > red ||
 			blue > red ||
