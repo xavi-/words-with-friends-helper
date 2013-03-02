@@ -40,7 +40,7 @@ function findWordScoreBox(pixels) {
 	for(var i = 0; i < pixels.data.length; i += 4) {
 		var red = pixels.data[i + 0], green = pixels.data[i + 1], blue = pixels.data[i + 2];
 
-		if(red > 120 && green < 40 && blue < 30) { // Score indicator hue
+		if(red > 150 && green < 20 && blue < 30) { // Score indicator hue
 			scoreBox = expandBoundingBox(scoreBox, { x: (i / 4) % BOARD.width, y: (i / 4 / BOARD.height) >> 0 });
 		}
 	}
