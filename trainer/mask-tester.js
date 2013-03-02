@@ -7,7 +7,7 @@ var parseSS = require("../parse-screenshot");
 const noop = function() {};
 const ALPHABET = "abcdefghijklmnopqrstuvwxyzW"; // W (lowercase W) is TW (triple word)
 
-function testMaskData(callback) {
+function testMasks(callback) {
 	var screens = require("./test-screens.json");
 
 	var pending = {};
@@ -59,11 +59,11 @@ function testMaskData(callback) {
 	});
 }
 
-exports.testMaskData = testMaskData;
+exports.testMasks = testMasks;
 
 if (require.main === module) { // being ran as script
 	console.log("Testing masks...");
-	testMaskData(function(err) {
+	testMasks(function(err) {
 		if(err) { throw err; }
 
 		console.log("Completed testing masks.");
